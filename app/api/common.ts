@@ -23,6 +23,7 @@ export async function requestOpenai(req: NextRequest) {
     }
     baseUrl = `${apiBaseUrl}/openai/deployments/${deployment}/chat/completions?api-version=${version}`;
     apiKey = process.env.AZURE_OPENAI_API_KEY || "";
+    openaiPath = "api/chat-completion";
     // model = '' // Azure Open AI always ignores the model and decides based on the deployment name passed through.
   } else {
     apiKey = req.headers.get("token");
