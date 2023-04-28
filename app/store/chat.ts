@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import { type ChatCompletionResponseMessage } from "openai";
 import {
   ControllerPool,
-  useRequestChatStream,
+  requestChatStream,
   requestWithPrompt,
 } from "../requests";
 import { isMobileScreen, trimTopic } from "../utils";
@@ -90,8 +90,8 @@ interface ChatStore {
   deleteSession: (index?: number) => void;
   currentSession: () => ChatSession;
   onNewMessage: (message: Message) => void;
-  useOnUserInput: (content: string) => Promise<void>;
-  useSummarizeSession: () => void;
+  onUserInput: (content: string) => Promise<void>;
+  summarizeSession: () => void;
   updateStat: (message: Message) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
   updateMessage: (
@@ -243,10 +243,10 @@ export const useChatStore = create<ChatStore>()(
           session.lastUpdate = Date.now();
         });
         get().updateStat(message);
-        get().useSummarizeSession();
+        get().summarizeSession();
       },
 
-      async useOnUserInput(content) {
+      async onUserInput(content) {
         const userMessage: Message = createMessage({
           role: "user",
           content,
@@ -273,7 +273,7 @@ export const useChatStore = create<ChatStore>()(
 
         // make request
         console.log("[User Input] ", sendMessages);
-        useRequestChatStream(sendMessages, {
+        requestChatStream(sendMessages, {
           onMessage(content, done) {
             // stream response
             if (done) {
@@ -395,7 +395,7 @@ export const useChatStore = create<ChatStore>()(
         });
       },
 
-      useSummarizeSession() {
+      summarizeSession() {
         const session = get().currentSession();
 
         // should summarize topic after chating more than 50 words
@@ -439,33 +439,32 @@ export const useChatStore = create<ChatStore>()(
           historyMsgLength,
           config.modelConfig.compressMessageLengthThreshold,
         );
-
-        useRequestChatStream(
-          toBeSummarizedMsgs.concat({
-            role: "system",
-            content: Locale.Store.Prompt.Summarize,
-            date: "",
-          }),
-          {
-            filterBot: false,
-            model: "gpt-3.5-turbo",
-            onMessage(message, done) {
-              session.memoryPrompt = message;
-              if (done) {
-                console.log("[Memory] ", session.memoryPrompt);
-                session.lastSummarizeIndex = lastSummarizeIndex;
-              }
-            },
-            onError(error) {
-              console.error("[Summarize] ", error);
-            },
-          },
-        );
         if (
           historyMsgLength >
             config.modelConfig.compressMessageLengthThreshold &&
           session.mask.modelConfig.sendMemory
         ) {
+          requestChatStream(
+            toBeSummarizedMsgs.concat({
+              role: "system",
+              content: Locale.Store.Prompt.Summarize,
+              date: "",
+            }),
+            {
+              filterBot: false,
+              model: "gpt-3.5-turbo",
+              onMessage(message, done) {
+                session.memoryPrompt = message;
+                if (done) {
+                  console.log("[Memory] ", session.memoryPrompt);
+                  session.lastSummarizeIndex = lastSummarizeIndex;
+                }
+              },
+              onError(error) {
+                console.error("[Summarize] ", error);
+              },
+            },
+          );
         }
       },
 
