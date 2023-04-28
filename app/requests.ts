@@ -169,12 +169,18 @@ export async function requestChatStream(
   const reqTimeoutId = setTimeout(() => controller.abort(), TIME_OUT_MS);
 
   try {
-    const res = await fetch("/api/chat-stream", {
+    let headers = getHeaders();
+    let url = "/api/chat-completion";
+
+    if (headers["token"] && headers["token"].length > 0) {
+      url = "/api/chat-stream";
+    }
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         path: "v1/chat/completions",
-        ...getHeaders(),
+        ...headers,
       },
       body: JSON.stringify(req),
       signal: controller.signal,

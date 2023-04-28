@@ -6,28 +6,19 @@ const PROTOCOL = process.env.PROTOCOL ?? DEFAULT_PROTOCOL;
 const BASE_URL = process.env.BASE_URL ?? OPENAI_URL;
 
 export async function requestOpenai(req: NextRequest) {
-  let apiKey = req.headers.get("token");
-  let openaiPath = req.headers.get("path");
-
-  let baseUrl = BASE_URL;
-
-  const useAzureOpenAI =
-    process.env.AZURE_OPENAI_API_BASE_URL &&
-    process.env.AZURE_OPENAI_API_BASE_URL.length > 0;
-  if (useAzureOpenAI) {
-    let apiBaseUrl = process.env.AZURE_OPENAI_API_BASE_URL;
-    const version = "2023-03-15-preview";
-    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "";
-    if (apiBaseUrl && apiBaseUrl.endsWith("/")) {
-      apiBaseUrl = apiBaseUrl.slice(0, -1);
-    }
-    baseUrl = `${apiBaseUrl}/openai/deployments/${deployment}/chat/completions?api-version=${version}`;
-    apiKey = process.env.AZURE_OPENAI_API_KEY || "";
-    openaiPath = "api/chat-completion";
-    // model = '' // Azure Open AI always ignores the model and decides based on the deployment name passed through.
-  } else {
-    apiKey = req.headers.get("token");
-    openaiPath = req.headers.get("path");
+  let apiBaseUrl = process.env.AZURE_OPENAI_API_BASE_URL;
+  const version = "2023-03-15-preview";
+  const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "";
+  if (apiBaseUrl && apiBaseUrl.endsWith("/")) {
+    apiBaseUrl = apiBaseUrl.slice(0, -1);
+  }
+  let baseUrl = `${apiBaseUrl}/openai/deployments/${deployment}/chat/completions?api-version=${version}`;
+  let apiKey = process.env.AZURE_OPENAI_API_KEY || "";
+  let openaiPath = "/api/chat-completion";
+  let token = req.headers.get("token");
+  if (token && token.length > 0) {
+    apiKey = req.headers.get("token") || "";
+    openaiPath = req.headers.get("path") || "";
 
     baseUrl = BASE_URL;
   }
