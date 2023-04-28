@@ -170,12 +170,12 @@ export async function requestChatStream(
 
   try {
     let headers = getHeaders();
-    let url = "/api/chat-completion";
+    // let url = "/api/chat-completion";
 
-    if (headers["token"] && headers["token"].length > 0) {
-      url = "/api/chat-stream";
-    }
-    const res = await fetch(url, {
+    // if (headers["token"] && headers["token"].length > 0) {
+    //   url = "/api/chat-stream";
+    // }
+    const res = await fetch("/api/chat-stream", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

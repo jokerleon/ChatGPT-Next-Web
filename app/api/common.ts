@@ -14,13 +14,15 @@ export async function requestOpenai(req: NextRequest) {
   }
   let baseUrl = `${apiBaseUrl}/openai/deployments/${deployment}/chat/completions?api-version=${version}`;
   let apiKey = process.env.AZURE_OPENAI_API_KEY || "";
-  let openaiPath = "/api/chat-completion";
+  let openaiPath = req.headers.get("path");
   let token = req.headers.get("token");
+  let finalUrl = baseUrl;
   if (token && token.length > 0) {
     apiKey = req.headers.get("token") || "";
     openaiPath = req.headers.get("path") || "";
 
     baseUrl = BASE_URL;
+    finalUrl = baseUrl + "/" + openaiPath;
   }
 
   if (!baseUrl.startsWith("http")) {
@@ -34,7 +36,7 @@ export async function requestOpenai(req: NextRequest) {
     console.log("[Org ID]", process.env.OPENAI_ORG_ID);
   }
 
-  return fetch(`${baseUrl}/${openaiPath}`, {
+  return fetch(`${finalUrl}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
