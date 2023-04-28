@@ -252,7 +252,7 @@ export const useChatStore = create<ChatStore>()(
           content,
         });
 
-        const botMessage: Message = createMessage({
+        var botMessage: Message = createMessage({
           role: "assistant",
           streaming: true,
           id: userMessage.id! + 1,
@@ -277,7 +277,9 @@ export const useChatStore = create<ChatStore>()(
             // stream response
             if (done) {
               botMessage.streaming = false;
-              botMessage.content = content;
+              const cloneObject = { ...botMessage, content: content };
+              // botMessage.content = content;
+              botMessage = cloneObject;
               get().onNewMessage(botMessage);
               ControllerPool.remove(
                 sessionIndex,
