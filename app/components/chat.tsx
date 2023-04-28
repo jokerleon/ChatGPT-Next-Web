@@ -437,7 +437,7 @@ export function Chat() {
   const onUserSubmit = () => {
     if (userInput.length <= 0) return;
     setIsLoading(true);
-    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
+    chatStore.useOnUserInput(userInput).then(() => setIsLoading(false));
     setBeforeInput(userInput);
     setUserInput("");
     setPromptHints([]);
@@ -511,7 +511,7 @@ export function Chat() {
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
-    chatStore.onUserInput(content).then(() => setIsLoading(false));
+    chatStore.useOnUserInput(content).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 

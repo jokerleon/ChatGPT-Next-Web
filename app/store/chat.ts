@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useEffect, useReducer, useRef, useState } from "react";
 
 import { type ChatCompletionResponseMessage } from "openai";
 import {
@@ -90,7 +91,7 @@ interface ChatStore {
   deleteSession: (index?: number) => void;
   currentSession: () => ChatSession;
   onNewMessage: (message: Message) => void;
-  onUserInput: (content: string) => Promise<void>;
+  useOnUserInput: (content: string) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: Message) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -246,7 +247,7 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(content) {
+      async useOnUserInput(content) {
         const userMessage: Message = createMessage({
           role: "user",
           content,
@@ -270,7 +271,7 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(userMessage);
           session.messages.push(botMessage);
         });
-
+        const [, forceUpdate] = useReducer((x) => !x, false);
         // make request
         console.log("[User Input] ", sendMessages);
         requestChatStream(sendMessages, {
@@ -286,6 +287,7 @@ export const useChatStore = create<ChatStore>()(
               );
             } else {
               botMessage.content = content;
+              forceUpdate();
               set(() => ({}));
             }
           },
