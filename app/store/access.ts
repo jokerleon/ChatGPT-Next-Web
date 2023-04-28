@@ -21,6 +21,7 @@ export const useAccessStore = create<AccessControlStore>()(
   persist(
     (set, get) => ({
       token: "",
+      selfToken: "",
       accessCode: "",
       needCode: true,
       enabledAccessControl() {

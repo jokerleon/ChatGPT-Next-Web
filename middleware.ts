@@ -58,7 +58,7 @@ export function middleware(req: NextRequest) {
         {
           status: 401,
         },
-      );
+      );  
     }
   } else {
     console.log("[Auth] set user token");

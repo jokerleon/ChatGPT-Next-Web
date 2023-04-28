@@ -14,6 +14,8 @@ export async function requestOpenai(req: NextRequest) {
   const useAzureOpenAI =
     process.env.AZURE_OPENAI_API_BASE_URL &&
     process.env.AZURE_OPENAI_API_BASE_URL.length > 0;
+
+  console.log("[Token] ", req.headers.get("token"));
   if (useAzureOpenAI) {
     let apiBaseUrl = process.env.AZURE_OPENAI_API_BASE_URL;
     const version = "2023-03-15-preview";
@@ -38,7 +40,6 @@ export async function requestOpenai(req: NextRequest) {
     baseUrl = `${PROTOCOL}://${baseUrl}`;
   }
 
-  console.log("[Token] ", apiKey);
   console.log("[Proxy] ", openaiPath);
   console.log("[Base Url]", baseUrl);
   console.log("[Final Url]", finalUrl);
