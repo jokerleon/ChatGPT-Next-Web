@@ -31,6 +31,7 @@ export async function requestOpenai(req: NextRequest) {
 
   console.log("[Proxy] ", openaiPath);
   console.log("[Base Url]", baseUrl);
+  console.log("[Final Url]", finalUrl);
 
   if (process.env.OPENAI_ORG_ID) {
     console.log("[Org ID]", process.env.OPENAI_ORG_ID);
@@ -40,6 +41,7 @@ export async function requestOpenai(req: NextRequest) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
+      "api-key": `${apiKey}`,
       ...(process.env.OPENAI_ORG_ID && {
         "OpenAI-Organization": process.env.OPENAI_ORG_ID,
       }),
