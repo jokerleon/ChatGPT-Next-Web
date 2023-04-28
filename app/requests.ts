@@ -1,4 +1,5 @@
 import type { ChatRequest, ChatResponse } from "./api/openai/typing";
+// import { useEffect, useReducer, useRef, useState } from 'react'
 import {
   Message,
   ModelConfig,
@@ -167,6 +168,7 @@ export async function requestChatStream(
 
   const controller = new AbortController();
   const reqTimeoutId = setTimeout(() => controller.abort(), TIME_OUT_MS);
+  // const [, forceUpdate] = useReducer((x) => !x, false)
 
   try {
     let headers = getHeaders();
@@ -211,6 +213,7 @@ export async function requestChatStream(
 
         const text = decoder.decode(content.value, { stream: true });
         responseText += text;
+        // forceUpdate()
 
         const done = content.done;
         options?.onMessage(responseText, false);
