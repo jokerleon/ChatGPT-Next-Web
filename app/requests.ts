@@ -146,8 +146,7 @@ export async function requestUsage() {
     subscription: total.hard_limit_usd,
   };
 }
-
-export async function requestChatStream(
+export async function useRequestChatStream(
   messages: Message[],
   options?: {
     filterBot?: boolean;
@@ -168,7 +167,7 @@ export async function requestChatStream(
 
   const controller = new AbortController();
   const reqTimeoutId = setTimeout(() => controller.abort(), TIME_OUT_MS);
-  // const [, forceUpdate] = useReducer((x) => !x, false)
+  const [, forceUpdate] = useReducer((x) => !x, false);
 
   try {
     let headers = getHeaders();
@@ -213,7 +212,7 @@ export async function requestChatStream(
 
         const text = decoder.decode(content.value, { stream: true });
         responseText += text;
-        // forceUpdate()
+        forceUpdate();
 
         const done = content.done;
         options?.onMessage(responseText, false);
