@@ -1,4 +1,10 @@
 import { NextRequest } from "next/server";
+import {
+  DEFAULT_CONFIG,
+  ModelConfig,
+  ModelType,
+  useAppConfig,
+} from "../store/config";
 
 const OPENAI_URL = "api.openai.com";
 const DEFAULT_PROTOCOL = "https";
@@ -16,25 +22,37 @@ export async function requestOpenai(req: NextRequest) {
     process.env.AZURE_OPENAI_API_BASE_URL.length > 0;
 
   console.log("[Token] ", req.headers.get("token"));
-  console.log("[req] ", req);
-  if (useAzureOpenAI) {
-    let apiBaseUrl = process.env.AZURE_OPENAI_API_BASE_URL;
-    const version = "2023-03-15-preview";
-    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "";
-    if (apiBaseUrl && apiBaseUrl.endsWith("/")) {
-      apiBaseUrl = apiBaseUrl.slice(0, -1);
-    }
-
-    baseUrl = `${apiBaseUrl}/openai/deployments/${deployment}/chat/completions?api-version=${version}`;
-    apiKey = process.env.AZURE_OPENAI_API_KEY || "";
-    openaiPath = req.headers.get("path") || "";
-    finalUrl = baseUrl;
-  } else {
+  if (
+    useAppConfig.getState().modelConfig.model == "gpt-4" ||
+    useAppConfig.getState().modelConfig.model == "gpt-4-0314" ||
+    useAppConfig.getState().modelConfig.model == "gpt-4-32k" ||
+    useAppConfig.getState().modelConfig.model == "gpt-4-32k-0314"
+  ) {
     apiKey = req.headers.get("token") || "";
     openaiPath = req.headers.get("path") || "";
 
     baseUrl = BASE_URL;
     finalUrl = baseUrl + "/" + openaiPath;
+  } else {
+    if (useAzureOpenAI) {
+      let apiBaseUrl = process.env.AZURE_OPENAI_API_BASE_URL;
+      const version = "2023-03-15-preview";
+      const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "";
+      if (apiBaseUrl && apiBaseUrl.endsWith("/")) {
+        apiBaseUrl = apiBaseUrl.slice(0, -1);
+      }
+
+      baseUrl = `${apiBaseUrl}/openai/deployments/${deployment}/chat/completions?api-version=${version}`;
+      apiKey = process.env.AZURE_OPENAI_API_KEY || "";
+      openaiPath = req.headers.get("path") || "";
+      finalUrl = baseUrl;
+    } else {
+      apiKey = req.headers.get("token") || "";
+      openaiPath = req.headers.get("path") || "";
+
+      baseUrl = BASE_URL;
+      finalUrl = baseUrl + "/" + openaiPath;
+    }
   }
 
   if (!baseUrl.startsWith("http")) {
