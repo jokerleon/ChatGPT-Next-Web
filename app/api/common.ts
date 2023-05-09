@@ -22,6 +22,7 @@ export async function requestOpenai(req: NextRequest) {
     process.env.AZURE_OPENAI_API_BASE_URL.length > 0;
 
   console.log("[Token] ", req.headers.get("token"));
+  console.log("[model] ", useAppConfig.getState().modelConfig.model);
   if (
     useAppConfig.getState().modelConfig.model == "gpt-4" ||
     useAppConfig.getState().modelConfig.model == "gpt-4-0314" ||
