@@ -5,10 +5,12 @@ import { StoreKey } from "../constant";
 export interface AccessControlStore {
   accessCode: string;
   token: string;
+  selfToken: string;
 
   needCode: boolean;
 
   updateToken: (_: string) => void;
+  updateSelfToken: (_: string) => void;
   updateCode: (_: string) => void;
   enabledAccessControl: () => boolean;
   isAuthorized: () => boolean;
@@ -34,6 +36,9 @@ export const useAccessStore = create<AccessControlStore>()(
       },
       updateToken(token: string) {
         set((state) => ({ token }));
+      },
+      updateSelfToken(token: string) {
+        set((state) => ({ selfToken: token }));
       },
       isAuthorized() {
         // has token or has code or disabled access control

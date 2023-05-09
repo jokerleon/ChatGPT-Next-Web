@@ -424,6 +424,7 @@ export function Settings() {
               placeholder={Locale.Settings.Token.Placeholder}
               onChange={(e) => {
                 accessStore.updateToken(e.currentTarget.value);
+                accessStore.updateSelfToken(e.currentTarget.value);
               }}
             />
           </ListItem>
